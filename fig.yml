@@ -1,0 +1,29 @@
+btsync:
+  image: kartoza/btsync
+  hostname: inasafe-btsync
+  volumes:
+    - ./inasafe-repository:/web
+  environment:
+    - SECRET=B3YGFVPOQP6JMCZNL47MLDFGIYNRDLKT7
+    - DEVICE=InaSAFE-Plugin-Repo
+
+cron:
+  build: docker-cron
+  hostname: cron
+  volumes:
+    - ./cron-scripts:/cron-scripts
+  volumes_from:
+    - btsync
+
+web:
+  image: nginx
+  hostname: nginx
+  volumes:
+    - ./sites-enabled:/etc/nginx/conf.d:ro
+    - ./logs:/var/log/nginx
+  volumes_from:
+    - btsync
+  ports:
+    - "61307:8080"
+
+
